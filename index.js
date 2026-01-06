@@ -7,17 +7,10 @@ dotenv.config();
 
 const app = express();
 
-/**
- * ✅ EXPRESS 5 + CORS FIX
- */
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+// ✅ Enable CORS globally
+app.use(cors()); 
 
-app.options("*", cors()); // 🔥 VERY IMPORTANT
-
+// ✅ Parse JSON
 app.use(express.json());
 
 // Health check
@@ -30,7 +23,6 @@ app.use("/api", aiRoutes);
 
 // Railway PORT
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port", PORT);
 });
