@@ -7,26 +7,28 @@ dotenv.config();
 
 const app = express();
 
-// 🔥 CORS FIX (ALLOW ALL ORIGINS)
+/**
+ * 🔥 CORS FIX — SAB ORIGINS ALLOWED
+ */
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());
 
 // test route
 app.get("/", (req, res) => {
-  res.send("Backend is running");
+  res.send("Backend is running OK");
 });
 
-// API routes
+// AI route
 app.use("/api", aiRoutes);
 
-// Railway / local port
-const PORT = process.env.PORT || 3000;
+// Railway PORT
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log("Server running on port", PORT);
 });
