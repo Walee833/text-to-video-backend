@@ -7,8 +7,12 @@ dotenv.config();
 
 const app = express();
 
-// CORS enable
-app.use(cors({ origin: "*" }));
+// 🔥 CORS FIX (ALLOW ALL ORIGINS)
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
 
 app.use(express.json());
 
@@ -17,10 +21,12 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-// AI routes
+// API routes
 app.use("/api", aiRoutes);
 
+// Railway / local port
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
