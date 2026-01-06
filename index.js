@@ -7,27 +7,29 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS — Express 5 compatible
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
-);
+/**
+ * ✅ EXPRESS 5 + CORS FIX
+ */
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.options("*", cors()); // 🔥 VERY IMPORTANT
 
 app.use(express.json());
 
-// health check
+// Health check
 app.get("/", (req, res) => {
-  res.status(200).send("Backend running on Railway");
+  res.status(200).send("Backend running OK");
 });
 
 // API routes
 app.use("/api", aiRoutes);
 
 // Railway PORT
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port", PORT);

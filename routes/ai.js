@@ -8,7 +8,7 @@ router.post("/generate-video", async (req, res) => {
     const { prompt, videoUrl, aspectRatio } = req.body;
 
     if (!prompt || !videoUrl) {
-      return res.status(400).json({ error: "prompt or videoUrl missing" });
+      return res.status(400).json({ error: "Missing fields" });
     }
 
     const result = await reframeVideo(
@@ -17,9 +17,10 @@ router.post("/generate-video", async (req, res) => {
       aspectRatio || "9:16"
     );
 
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("API Error:", error);
+    res.json({ status: "success", video: result });
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "AI error" });
   }
 });

@@ -5,15 +5,16 @@ const replicate = new Replicate({
 });
 
 export async function reframeVideo(prompt, videoUrl, aspectRatio) {
-  const output = await replicate.run("luma/reframe-video", {
-    input: {
-      prompt,
-      video_url: videoUrl,
-      aspect_ratio: aspectRatio
+  const output = await replicate.run(
+    "luma/reframe-video",
+    {
+      input: {
+        prompt,
+        video_url: videoUrl,
+        aspect_ratio: aspectRatio
+      }
     }
-  });
+  );
 
-  return {
-    video: output.url()
-  };
+  return output.url();
 }
