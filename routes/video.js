@@ -2,15 +2,29 @@ const express = require("express");
 const router = express.Router();
 const { reframeVideo } = require("../services/ai");
 
-router.post("/reframe", async (req, res) => {
-  const { prompt, videoUrl, aspectRatio } = req.body;
-  if (!prompt || !videoUrl) return res.status(400).json({ message: "prompt and videoUrl required" });
-
+// POST /api/generate-video
+router.post("/generate-video", async (req, res) => {
   try {
-    const output = await reframeVideo(prompt, videoUrl, aspectRatio || "9:16");
-    res.json({ message: "Video processed", output });
+    const { prompt, videoUrl } = req.body;
+
+    if (!prompt || !videoUrl) {
+      return res.status(400).json({
+        message: "prompt aur videoUrl required hai",
+      });
+    }
+
+    const output = await reframeVideo(prompt, videoUrl);
+
+    res.json({
+      message: "Video processed",
+      output: output,
+    });
+
   } catch (err) {
-    res.status(500).json({ message: "AI call error", error: err.toString() });
+    res.status(500).json({
+      message: "AI call error",
+      error: err.message,
+    });
   }
 });
 
