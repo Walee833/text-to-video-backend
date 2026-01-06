@@ -1,17 +1,17 @@
 import express from "express";
-import cors from "cors";          // 👈 CORS import
+import cors from "cors";
 import dotenv from "dotenv";
 import aiRoutes from "./routes/ai.js";
 
 dotenv.config();
 const app = express();
 
-// 👇 CORS enable
+// 👇 CORS for all origins
 app.use(cors({
-    origin: "*"  // sab origins allow
+    origin: "*"  // ye sab frontend urls allow karega
 }));
 
-app.use(express.json()); // body parser
+app.use(express.json());
 
 // test route
 app.get("/", (req, res) => {
@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 // AI routes
 app.use("/api", aiRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080; // Railway ke liye 8080
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
