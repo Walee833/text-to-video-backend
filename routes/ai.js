@@ -5,10 +5,21 @@ const { generateVideo } = require("../services/ai");
 router.post("/generate-video", async (req, res) => {
   try {
     const { prompt } = req.body;
-    const video = await generateVideo(prompt);
-    res.json({ video });
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    const videoBuffer = await generateVideo(prompt);
+
+    res.set({
+      "Content-Type": "video/mp4"
+    });
+
+    res.send(videoBuffer);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("ROUTE ERROR:", err);
+    res.status(500).json({ error: "Video generation failed" });
   }
 });
 

@@ -1,44 +1,49 @@
-const fetch = require("node-fetch");
+const fetch = require('node-fetch'); // make sure node-fetch installed ho
+require('dotenv').config();
 
-const API_KEY = process.env.JSON2VIDEO_API_KEY;
+const HF_API_KEY = process.env.HF_API_KEY;
 
-async function generateVideo(prompt) {
+async function generateVideo(prompt, videoUrl, aspectRatio = "9:16") {
   try {
-    const response = await fetch("https://api.json2video.com/v2/movies", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY
-      },
-      body: JSON.stringify({
-        resolution: "1080p",
-        scenes: [
-          {
-            elements: [
-              {
-                type: "text",
-                text: prompt,
-                style: {
-                  fontSize: 48
-                }
-              }
-            ]
+    console.log("HF request start...");
+    console.log("Prompt:", prompt);
+
+    const response = await fetch(
+      "https://router.huggingface.co/models/damo-vilab/text-to-video-ms-1.7b",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${HF_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: {
+            aspect_ratio: aspectRatio,
+            video: videoUrl
           }
-        ]
-      })
-    });
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.json();
+      console.error("HF ERROR:", err);
+      throw new Error("HF request failed");
+    }
 
     const data = await response.json();
+    console.log("HF response:", data);
 
-    if (!data || !data.movieId) {
+    if (data && data.output && data.output.length > 0) {
+      return { video: data.output[0] };
+    } else {
       throw new Error("Video creation failed");
     }
 
-    return `https://json2video.com/watch/${data.movieId}`;
-
-  } catch (err) {
-    console.error("JSON2VIDEO ERROR:", err);
-    throw err;
+  } catch (error) {
+    console.error("AI SERVICE ERROR:", error);
+    return { error: error.message };
   }
 }
 
