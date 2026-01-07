@@ -1,28 +1,22 @@
-import express from "express";
-import { reframeVideo } from "../services/ai.js";
-
+const express = require("express");
 const router = express.Router();
+const { reframeVideo } = require("../services/ai");
 
 router.post("/generate-video", async (req, res) => {
   try {
     const { prompt, videoUrl, aspectRatio } = req.body;
 
     if (!prompt || !videoUrl) {
-      return res.status(400).json({ error: "Missing fields" });
+      return res.status(400).json({ message: "Missing data" });
     }
 
-    const result = await reframeVideo(
-      prompt,
-      videoUrl,
-      aspectRatio || "9:16"
-    );
+    const video = await reframeVideo(prompt, videoUrl, aspectRatio);
 
-    res.json({ status: "success", video: result });
-
+    res.json({ video });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "AI error" });
+    res.status(500).json({ message: "AI error", error: err.message });
   }
 });
 
-export default router;
+module.exports = router;

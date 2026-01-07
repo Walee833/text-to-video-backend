@@ -1,28 +1,39 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import aiRoutes from "./routes/ai.js";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const aiRoutes = require("./routes/ai");
 
 dotenv.config();
 
 const app = express();
 
-// ✅ Enable CORS globally
-app.use(cors()); 
+/**
+ * 🔥 CORS FIX (IMPORTANT)
+ * allow all origins + preflight
+ */
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-// ✅ Parse JSON
+// preflight explicitly handle
+app.options("*", cors());
+
 app.use(express.json());
 
-// Health check
+// test route
 app.get("/", (req, res) => {
-  res.status(200).send("Backend running OK");
+  res.send("Backend is running OK");
 });
 
-// API routes
+// AI routes
 app.use("/api", aiRoutes);
 
-// Railway PORT
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, "0.0.0.0", () => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
