@@ -1,47 +1,45 @@
-const Replicate = require("replicate");
-require("dotenv").config();
+const fetch = require("node-fetch");
 
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN
-});
+const API_KEY = process.env.JSON2VIDEO_API_KEY;
 
-async function reframeVideo(prompt, videoUrl, aspectRatio = "9:16") {
+async function generateVideo(prompt) {
   try {
-    const prediction = await replicate.predictions.create({
-      model: "luma/reframe-video",
-      input: {
-        prompt,
-        video_url: videoUrl,
-        aspect_ratio: aspectRatio
-      }
+    const response = await fetch("https://api.json2video.com/v2/movies", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": API_KEY
+      },
+      body: JSON.stringify({
+        resolution: "1080p",
+        scenes: [
+          {
+            elements: [
+              {
+                type: "text",
+                text: prompt,
+                style: {
+                  fontSize: 48
+                }
+              }
+            ]
+          }
+        ]
+      })
     });
 
-    console.log("Prediction started:", prediction.id);
+    const data = await response.json();
 
-    let status = prediction.status;
-    let output = null;
-
-    while (status !== "succeeded" && status !== "failed") {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const updated = await replicate.predictions.get(prediction.id);
-      status = updated.status;
-      output = updated.output;
-      console.log("Current status:", status);
+    if (!data || !data.movieId) {
+      throw new Error("Video creation failed");
     }
 
-    if (status === "succeeded") {
-      if (Array.isArray(output)) {
-        return output[0];
-      }
-      return output;
-    } else {
-      throw new Error("Video generation failed");
-    }
+    return `https://json2video.com/watch/${data.movieId}`;
 
   } catch (err) {
-    console.error("Replicate error:", err);
+    console.error("JSON2VIDEO ERROR:", err);
     throw err;
   }
 }
 
-module.exports = { reframeVideo };
+module.exports = { generateVideo };
